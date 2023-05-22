@@ -112,6 +112,40 @@ def temp_monthly():
     temps = list(np.ravel(results))
     return jsonify(temps=temps)
 
+# *********************************** Module 9.5.6 ***********************
+
+# New Route - return minimum, maximum, and average temperatures.
+# Define route & route name for Start AND End.
+
+@app.route("/api/v1.0/temp/<start>")
+@app.route("/api/v1.0/temp/<start>/<end>")
+
+# Create new function called stats().
+# Add a start AND an end parameter to stats() function.
+
+# Create query to select the min, avg, and max temperatures from our SQLite database.
+#   Create list called sel.
+# Add if-not statement to determine the start and end date.
+#     THEN convert Unravel results into a 1-dimensional array, then convert to list(),
+#     THEN jsonify list and return it as JSON.
+# Using sel list, Calculate min avg and max temps WITH the start and end dates.
+# Create ANOTHER query to collect statistics data.
+
+def stats(start=None, end=None):
+    sel = [func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)]
+
+    if not end:
+        results = session.query(*sel).\
+            filter(Measurement.date >= start).all()
+        temps = list(np.ravel(results))
+        return jsonify(temps)
+
+    results = session.query(*sel).\
+        filter(Measurement.date >= start).\
+        filter(Measurement.date <= end).all()
+    temps = list(np.ravel(results))
+    return jsonify(temps)
+
 
 # make sure to hv this at the END of ALL routes
 if __name__ == "__main__":
